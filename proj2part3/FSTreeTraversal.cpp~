@@ -1,0 +1,103 @@
+// FSTreeTraversal.cpp
+// Purpose: to traverse the FSTree and call the hashTable's search functions to
+// find and print the locations at which the word is located
+// By: Dylan Park
+// Date: 11/13/16
+//
+//
+#include <iostream>
+#include <string>
+#include <locale>
+#include "DirNode.h"
+#include "FSTreeTraversal.h"
+#include "FSTree.h"
+#include "hashTable.h"
+
+using namespace std;
+
+// constructor
+FSTreeTraversal::FSTreeTraversal() {
+        numFound = 0;
+}
+
+// destructor
+FSTreeTraversal::~FSTreeTraversal() {
+}
+
+// traverse
+// Purpose: to call the traverse_rec function and pass it in the root 
+// of the FSTree, the directory name for it to manipulate, and the queryMode
+// Arguments: string of the directoryName and queryMode and pointer to root
+// Return Value: none
+void FSTreeTraversal::traverse(DirNode *root, string directoryName, 
+string queryMode) {
+        string path = directoryName;
+        traverse_rec(root, path, queryMode); //call function passing in
+}       // the root and the directory name string
+
+// traverse_rec
+// Purpose: to traverse the tree, read file, create hashTables for each file, 
+// and then search hashTable for certain word
+// Arguments: pointer to a DirNode, string for the path, and string of queryMode
+// Return Value: none
+void FSTreeTraversal::traverse_rec(DirNode *current, string path, 
+string queryMode) {
+        string word = queryMode;
+        if (current->hasSubDir()) { // if the current directory has subdir
+                for (int j = 0; j < current->numSubDirs(); j++) {
+                        DirNode *subDir = current->getSubDir(j);
+                        traverse_rec(subDir, path + "/" + 
+                        subDir->getName(), queryMode);
+                }       //recursively call function passing in the next
+        }               //subdirectory, the updated path, and the querymode 
+        searchFiles(current, path, queryMode);
+}
+
+// searchFiles
+// Purpose: to search through each file, establish the filestring, create a hash
+// table for the file, and search for the query
+// Arguments: pointer to DirNode and string of path and queryMode
+// Return Value: none
+void FSTreeTraversal::searchFiles(DirNode *current, string path, 
+string queryMode) {
+        string word = queryMode;
+        if (current->hasFiles()) {
+                for (int i = 0; i < current->numFiles(); i++) {
+                        string filestring = path; 
+                        string filename = "/" + current->getFile(i); 
+                        filestring = filestring + filename; // append filename 
+                        hashTable ht; // to newly created filestring
+                        ht.checkSize();
+                        // perform insensitive search and capitalize queryMode
+                        if (queryMode.substr(0,13) == "@insensitive ") { 
+                                ht.readFromFile(filestring, true); 
+                                word = ht.capitalize(queryMode.substr(13));
+                                numFound = numFound + ht.search(word, filestring
+                                , ht.hash(word)); 
+                        } 
+                        else if (queryMode.substr(0,3) == "@i ") {
+                                ht.readFromFile(filestring, true); 
+                                word = ht.capitalize(queryMode.substr(3));
+                                numFound = numFound + ht.search(word, filestring
+                                , ht.hash(word));
+                        }  
+                        else { // perform the sensitive search
+                                ht.readFromFile(filestring, false);
+                                numFound = numFound + ht.search(queryMode, 
+                                filestring, ht.hash(queryMode));
+                        }
+                }
+        }
+} 
+
+
+// errorMessage
+// Purpose: to print the error message if the program cannot find the word
+// Arguments: string of queryMode
+// Return Value: none
+void FSTreeTraversal::errorMessage(string queryMode) {
+        if (numFound == 0) {
+                cout << queryMode << "Not Found. Try with @insensitive or @i." 
+                << endl;
+        }
+}

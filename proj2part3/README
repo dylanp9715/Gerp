@@ -1,0 +1,73 @@
+Project 2
+By: Dylan Park
+Files:
+        FSTreeTraversal.h - to establish and define the FSTreeTraversal class
+        which goes through each file and calls the functions in hashTable to 
+        read the files, create a hashTable for each file, and search the table
+        for a specified word
+
+        FSTreeTraversal.cpp - to implement the FSTreeTraversal class. Has the 
+        traversal functions that go through the tree and do what is mentioned 
+        above
+
+        hashTable.h - to establish and define the hashTable class which has an 
+        array of pointers to linked lists of wordNodes that holds the info
+        regarding the lineNumber, the word being searched for, the line it 
+        appears in the file, and a pointer to the next node. It does the actual 
+        reading and searching of the file and prints out the output when it 
+        finds the word
+
+        hashTable.cpp - to implement the hashTable class and has the functions 
+        to manipulate and search the array, as well as reading in the file
+
+        wordNode.h - to create the wordNode which is what the hashTable is made
+        of
+
+        main.cpp - to run the entire program 
+
+Compile:
+        Due to the fact that I created a makefile, you just have to type make to
+        compile
+
+Run:
+        ./gerp DirectoryToIndex
+
+Architectural Overview:
+        The FSTreeTraversal stores the data for the filepath that must be
+        printed in the hashTable file. In addition, it stores the queryMode.
+        It then passes in this data into the hashTable class for it to 
+        use. The hashTable is then filled with wordNodes. This is how the files
+        are interconnected.
+
+Data Structures:
+        I used an array for my hashTable due to the fact that if given an index
+        it can quickly access the data located there. This is incredibly 
+        beneficial for me because I can simply pass in the result of the hash
+        function to find the word. I then used a linked list to perform chaining
+        if there are collisions within the hashTable due to the fact that I can
+        simply append to the end when there happens to be a collision.
+
+Algorithms:
+        Given an n-ary tree full of directories, I traversed each one finding
+        the files within each one. For each file within a directory, I created 
+        a hashTable, read through the file, and then organized the table by 
+        each word in the file. After creating this hashTable, I then searched 
+        through it for a specififed word by immediately going to the spot in the
+        array that the hash function told me the word was located and for each
+        instance of the word, I printed out the filepath, line number (using a 
+        separate line vector), and the line itself. This method sacrifices query
+        time for indexing time, for instead of indexing all the words from every
+        file, I simply make a hash table for each file. This, however, makes the
+        time it takes to find the query slightly slower because it has to search
+        through each hash table as they are created. This trade off though 
+        proves to be beneficial for my program was often faster than the gerp. 
+        To perform the insensitive search, I simply capitalized both the query 
+        and the words in the hash table and printed the information out whenever
+        there was a match.
+
+Testing:
+        To test my program, I created a directory within my proj2part3 folder
+        and then placed files within the directory and searched for these words
+        using either insensitive or sensitive search. I also used the suggested
+        commands to compare my program with the_gerp using mostly tinyData, 
+        smallGutenberg, and mediumGutenberg. 
